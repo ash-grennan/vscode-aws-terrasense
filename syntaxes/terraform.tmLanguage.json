@@ -1,0 +1,63 @@
+{
+    "name": "Terraform",
+    "scopeName": "source.terraform",
+    "fileTypes": [".tf"],
+    "patterns": [
+      {
+        "include": "#comments"
+      },
+      {
+        "include": "#blocks"
+      },
+      {
+        "include": "#strings"
+      }
+    ],
+    "repository": {
+      "comments": {
+        "patterns": [
+          {
+            "name": "comment.line.number-sign.terraform",
+            "match": "#.*$"
+          }
+        ]
+      },
+      "blocks": {
+        "patterns": [
+          {
+            "name": "meta.block.terraform",
+            "begin": "\\b(resource|variable|provider|output|module|data)\\b",
+            "end": "(\\})",
+            "beginCaptures": {
+              "1": { "name": "keyword.control.terraform" }
+            },
+            "endCaptures": {
+              "1": { "name": "punctuation.section.block.end.terraform" }
+            },
+            "patterns": [
+              {
+                "name": "punctuation.section.block.begin.terraform",
+                "match": "\\{"
+              }
+            ]
+          }
+        ]
+      },
+      "strings": {
+        "patterns": [
+          {
+            "name": "string.quoted.double.terraform",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+              {
+                "name": "constant.character.escape.terraform",
+                "match": "\\\\(x[0-9A-Fa-f]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
