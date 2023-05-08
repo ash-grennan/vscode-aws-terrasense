@@ -1,26 +1,53 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  let disposable = vscode.languages.registerCompletionItemProvider(
+    { pattern: '**/*.tf' },
+    {
+      provideCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext
+      ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        const lineNumber = position.line;
+        let withinActionsArray = false;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-aws-terrasense" is now active!');
+        for (let i = lineNumber; i >= 0; i--) {
+          const currentLine = document.lineAt(i).text;
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-aws-terrasense.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode-aws-terrasense!');
-	});
+          if (currentLine.match(/actions\s*=\s*\[/)) {
+            withinActionsArray = true;
+            break;
+          }
 
-	context.subscriptions.push(disposable);
+          if (currentLine.match(/\]/)) {
+            break;
+          }
+        }
+
+        if (withinActionsArray) {
+          const suggestions = [
+            's3:GetObject',
+            's3:PutObject',
+            's3:ListBucket',
+            'ec2:DescribeInstances',
+            'ec2:StartInstances',
+          ];
+
+          return suggestions.map(
+            (suggestion) =>
+              new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value)
+          );
+        }
+
+        return undefined;
+      },
+    },
+    '\n' // Trigger the completion when a newline is added
+  );
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
