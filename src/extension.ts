@@ -1,6 +1,13 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
+  const suggestionsPath = path.join(context.extensionPath, 'suggestions.json');
+  const suggestionsContent = fs.readFileSync(suggestionsPath, 'utf8');
+  const suggestionsData = JSON.parse(suggestionsContent);
+  const suggestions: string[] = suggestionsData.suggestions;
+
   let disposable = vscode.languages.registerCompletionItemProvider(
     { pattern: '**/*.tf' },
     {
@@ -27,14 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         if (withinActionsArray) {
-          const suggestions = [
-            's3:GetObject',
-            's3:PutObject',
-            's3:ListBucket',
-            'ec2:DescribeInstances',
-            'ec2:StartInstances',
-          ];
-
           return suggestions.map(
             (suggestion) =>
               new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value)
