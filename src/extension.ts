@@ -17,7 +17,7 @@ export const sortSuggestions = (suggestions: string[], previousResource: string)
   });
 }
 
-export const findPreviousResource = (document: vscode.TextDocument, position: vscode.Position): string | undefined => {
+export const findPreviousResource = (document: vscode.TextDocument, position: vscode.Position): string => {
   let previousResource = '';
 
   for (let i = position.line - 1; i >= 0; i--) {
@@ -52,10 +52,8 @@ export const isWithinActionsArray = (document: vscode.TextDocument, position: vs
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  const suggestionsPath = path.join(context.extensionPath, 'suggestions.json');
-  const suggestionsContent = fs.readFileSync(suggestionsPath, 'utf8');
-  const suggestionsData = JSON.parse(suggestionsContent);
-  const suggestions: string[] = suggestionsData.suggestions;
+  const suggestionsContent = fs.readFileSync(path.join(context.extensionPath, 'src/suggestions', 'actions.json'), 'utf8');
+  const suggestions: string[] = JSON.parse(suggestionsContent).suggestions;
 
   let disposable = vscode.languages.registerCompletionItemProvider(
     { pattern: '**/*.tf' },
@@ -71,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         const previousResource = findPreviousResource(document, position);
-        const sortedSuggestions = sortSuggestions(suggestions, previousResource || '');
+        const sortedSuggestions = sortSuggestions(suggestions, previousResource);
 
         return sortedSuggestions.map((suggestion, index) => {
           const item = new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value);
@@ -80,7 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
         });
       },
     },
-    '\n' // trigger on newline, providing we're in the actions array
+    '\n' // want this to trigger on newline (providing we're in the array)
   );
 
   context.subscriptions.push(disposable);
