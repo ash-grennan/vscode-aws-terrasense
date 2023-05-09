@@ -1,6 +1,55 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
+
+export const sortSuggestions = (suggestions: string[], previousResource: string): string[] => {
+  return suggestions.sort((a, b) => {
+    const aSameResource = a.startsWith(previousResource);
+    const bSameResource = b.startsWith(previousResource);
+
+    if (aSameResource && !bSameResource) {
+      return -1;
+    }
+    if (!aSameResource && bSameResource) {
+      return 1;
+    }
+    return a.localeCompare(b);
+  });
+}
+
+export const findPreviousResource = (document: vscode.TextDocument, position: vscode.Position): string | undefined => {
+  let previousResource = '';
+
+  for (let i = position.line - 1; i >= 0; i--) {
+    const currentLine = document.lineAt(i).text;
+    const match = currentLine.match(/"([^:]+):/); // last prev line
+    if (match) {
+      previousResource = match[1];
+      break;
+    }
+  }
+
+  return previousResource;
+}
+
+export const isWithinActionsArray = (document: vscode.TextDocument, position: vscode.Position): boolean => {
+  let withinActionsArray = false;
+
+  for (let i = position.line - 1; i >= 0; i--) {
+    const currentLine = document.lineAt(i).text;
+
+    if (currentLine.match(/actions\s*=\s*\[/)) {
+      withinActionsArray = true;
+      break;
+    }
+
+    if (currentLine.match(/\]/)) {
+      break;
+    }
+  }
+
+  return withinActionsArray;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const suggestionsPath = path.join(context.extensionPath, 'suggestions.json');
@@ -17,33 +66,21 @@ export function activate(context: vscode.ExtensionContext) {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
       ): vscode.ProviderResult<vscode.CompletionItem[]> {
-        const lineNumber = position.line;
-        let withinActionsArray = false;
-
-        for (let i = lineNumber; i >= 0; i--) {
-          const currentLine = document.lineAt(i).text;
-
-          if (currentLine.match(/actions\s*=\s*\[/)) {
-            withinActionsArray = true;
-            break;
-          }
-
-          if (currentLine.match(/\]/)) {
-            break;
-          }
+        if (!isWithinActionsArray(document, position)) {
+          return undefined;
         }
 
-        if (withinActionsArray) {
-          return suggestions.map(
-            (suggestion) =>
-              new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value)
-          );
-        }
+        const previousResource = findPreviousResource(document, position);
+        const sortedSuggestions = sortSuggestions(suggestions, previousResource || '');
 
-        return undefined;
+        return sortedSuggestions.map((suggestion, index) => {
+          const item = new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value);
+          item.sortText = index.toString().padStart(5, '0');
+          return item;
+        });
       },
     },
-    '\n' // Trigger the completion when a newline is added
+    '\n' // trigger on newline, providing we're in the actions array
   );
 
   context.subscriptions.push(disposable);
