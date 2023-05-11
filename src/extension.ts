@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-export const sortSuggestions = (suggestions: string[], previousResource: string): string[] => {
+export const sortSuggestions = (suggestions: string[], previous: string): string[] => {
   return suggestions.sort((a, b) => {
-    const aSameResource = a.startsWith(previousResource);
-    const bSameResource = b.startsWith(previousResource);
+    const aSameResource = a.startsWith(previous);
+    const bSameResource = b.startsWith(previous);
 
     if (aSameResource && !bSameResource) {
       return -1;

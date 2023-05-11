@@ -1,5 +1,5 @@
 import type { TextDocument, Position } from 'vscode';
-import { isWithinActionsArray } from '../extension';
+import { isWithinActionsArray, sortSuggestions } from '../extension';
 
 jest.mock('vscode', () => ({
   TextDocument: class {
@@ -14,7 +14,7 @@ jest.mock('vscode', () => ({
   },
 }));
 
-describe('isWithinActionsArray', () => {
+describe('intellisnse suggestions for actions', () => {
   const createDocumentMock = (lines: string[]): TextDocument => {
     const document = new (jest.requireMock('vscode').TextDocument)();
     document.lineAt = (line: number) => ({ text: lines[line] });
@@ -50,4 +50,21 @@ describe('isWithinActionsArray', () => {
     const result = isWithinActionsArray(document, position);
     expect(result).toBe(false);
   });
+
+  it('should sort suggestions based on previous resource ', () => {
+    const suggestions = [
+      "dynamodb:DeleteTable",
+      "s3:GetObject",
+      "s3:PutObject",
+    ];
+    const previous = 's3:GetObject';
+    const sortedSuggestions = sortSuggestions(suggestions, previous);
+
+    expect(sortedSuggestions).toEqual([
+      's3:GetObject',
+      'dynamodb:DeleteTable',
+      's3:PutObject'
+    ]);
+  });
+
 });
