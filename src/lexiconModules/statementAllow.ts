@@ -33,7 +33,11 @@ export class StatementAllow implements LexiconLocator {
 
     return false;
   }
+
   execute(): any {
-    return "boo"
+    return [
+      new vscode.CompletionItem(`"Allow"`, vscode.CompletionItemKind.Value),
+      new vscode.CompletionItem(`"Deny"`, vscode.CompletionItemKind.Value),
+    ];
   }
 }

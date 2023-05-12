@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
       },
     },
-    "\n" // want this to trigger on newline (providing we're in the array)
+    "\n" // want this to trigger on newline
   );
 
   context.subscriptions.push(disposable);
