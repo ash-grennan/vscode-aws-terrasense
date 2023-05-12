@@ -34,57 +34,6 @@ export class StatementAllow implements LexiconLocator {
     return false;
   }
   execute(): any {
-    const suggestionsContent = fs.readFileSync(
-      path.join(this._context.extensionPath, "src/suggestions", "actions.json"),
-      "utf8"
-    );
-    const suggestions: string[] = JSON.parse(suggestionsContent).suggestions;
-    const previousResource = this.findPreviousResource();
-    const sortedSuggestions = this.sortSuggestions(
-      suggestions,
-      previousResource
-    );
-
-    return sortedSuggestions.map((suggestion, index) => {
-      const item = new vscode.CompletionItem(
-        `"${suggestion}"`,
-        vscode.CompletionItemKind.Value
-      );
-      item.sortText = index.toString().padStart(5, "0");
-      return item;
-    });
+    return "boo"
   }
-
-  private sortSuggestions = (
-    suggestions: string[],
-    previous: string
-  ): string[] => {
-    return suggestions.sort((a, b) => {
-      const aSameResource = a.startsWith(previous);
-      const bSameResource = b.startsWith(previous);
-
-      if (aSameResource && !bSameResource) {
-        return -1;
-      }
-      if (!aSameResource && bSameResource) {
-        return 1;
-      }
-      return a.localeCompare(b);
-    });
-  };
-
-  private findPreviousResource = (): string => {
-    let previousResource = "";
-
-    for (let i = this._position.line - 1; i >= 0; i--) {
-      const currentLine = this._document.lineAt(i).text;
-      const match = currentLine.match(/"([^:]+):/); // last prev line
-      if (match) {
-        previousResource = match[1];
-        break;
-      }
-    }
-
-    return previousResource;
-  };
 }
