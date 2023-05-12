@@ -1,9 +1,12 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
-import { isWithinActionsArray } from './locators';
+import * as vscode from "vscode";
+import { StatementActions } from "./lexiconModules/statementActions";
+import { StatementAllow } from "./lexiconModules/statementAllow";
+import { LexiconLocator } from "./lexiconModules/types";
 
-export const sortSuggestions = (suggestions: string[], previous: string): string[] => {
+export const sortSuggestions = (
+  suggestions: string[],
+  previous: string
+): string[] => {
   return suggestions.sort((a, b) => {
     const aSameResource = a.startsWith(previous);
     const bSameResource = b.startsWith(previous);
@@ -16,10 +19,13 @@ export const sortSuggestions = (suggestions: string[], previous: string): string
     }
     return a.localeCompare(b);
   });
-}
+};
 
-export const findPreviousResource = (document: vscode.TextDocument, position: vscode.Position): string => {
-  let previousResource = '';
+export const findPreviousResource = (
+  document: vscode.TextDocument,
+  position: vscode.Position
+): string => {
+  let previousResource = "";
 
   for (let i = position.line - 1; i >= 0; i--) {
     const currentLine = document.lineAt(i).text;
@@ -31,16 +37,20 @@ export const findPreviousResource = (document: vscode.TextDocument, position: vs
   }
 
   return previousResource;
-}
-
-
+};
 
 export function activate(context: vscode.ExtensionContext) {
-  const suggestionsContent = fs.readFileSync(path.join(context.extensionPath, 'src/suggestions', 'actions.json'), 'utf8');
-  const suggestions: string[] = JSON.parse(suggestionsContent).suggestions;
+  const extensionContext = context;
+  let locators: Array<
+    new (
+      document: vscode.TextDocument,
+      position: vscode.Position,
+      context: vscode.ExtensionContext
+    ) => LexiconLocator
+  > = [StatementActions, StatementAllow];
 
   let disposable = vscode.languages.registerCompletionItemProvider(
-    { pattern: '**/*.tf' },
+    { pattern: "**/*.tf" },
     {
       provideCompletionItems(
         document: vscode.TextDocument,
@@ -48,25 +58,17 @@ export function activate(context: vscode.ExtensionContext) {
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
       ): vscode.ProviderResult<vscode.CompletionItem[]> {
+        // get line text
 
-                   // get line text
-
-
-        if (!isWithinActionsArray(document, position)) {
-          return undefined;
+        for (let action of locators) {
+          const uow = new action(document, position, extensionContext);
+          if (uow.find()) {
+            return uow.execute();
+          }
         }
-
-        const previousResource = findPreviousResource(document, position);
-        const sortedSuggestions = sortSuggestions(suggestions, previousResource);
-
-        return sortedSuggestions.map((suggestion, index) => {
-          const item = new vscode.CompletionItem(`"${suggestion}"`, vscode.CompletionItemKind.Value);
-          item.sortText = index.toString().padStart(5, '0');
-          return item;
-        });
       },
     },
-    '\n' // want this to trigger on newline (providing we're in the array)
+    "\n" // want this to trigger on newline (providing we're in the array)
   );
 
   context.subscriptions.push(disposable);
