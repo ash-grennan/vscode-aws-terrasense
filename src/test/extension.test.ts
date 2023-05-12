@@ -1,5 +1,6 @@
 import type { TextDocument, Position } from 'vscode';
-import { isWithinActionsArray, sortSuggestions } from '../extension';
+import { sortSuggestions } from '../extension';
+import { isWithinActionsArray } from '../locators';
 
 jest.mock('vscode', () => ({
   TextDocument: class {
@@ -14,7 +15,7 @@ jest.mock('vscode', () => ({
   },
 }));
 
-describe('intellisnse suggestions for actions', () => {
+describe('intellisense suggestions for actions', () => {
   const createDocumentMock = (lines: string[]): TextDocument => {
     const document = new (jest.requireMock('vscode').TextDocument)();
     document.lineAt = (line: number) => ({ text: lines[line] });
