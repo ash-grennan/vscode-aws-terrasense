@@ -39,7 +39,7 @@ describe("Statement Allow", () => {
       .fn()
       .mockReturnValueOnce({ text: "effect =" })
       .mockReturnValueOnce({ text: "statement {" });
-    const position = new vscode.Position(1, 0);
+    const position = new vscode.Position(0, 8);
     const statementAllow = new StatementAllow(document, position, context);
     const result = statementAllow.find();
 
@@ -51,7 +51,7 @@ describe("Statement Allow", () => {
       .fn()
       .mockReturnValueOnce({ text: "effect =" })
       .mockReturnValueOnce({ text: "}" });
-    const position = new vscode.Position(7, 0);
+    const position = new vscode.Position(0, 8);
     const statementAllow = new StatementAllow(document, position, context);
     const result = statementAllow.find();
 
