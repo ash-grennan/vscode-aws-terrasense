@@ -58,6 +58,18 @@ describe("Statement Allow", () => {
     expect(result).toBe(false);
   });
 
+  it("should return false if 'effect' is not found", () => {
+    document.lineAt = jest
+      .fn()
+      .mockReturnValueOnce({ text: "doesntExist =" })
+      .mockReturnValueOnce({ text: "statement {" });
+    const position = new vscode.Position(0, 8);
+    const statementAllow = new StatementAllow(document, position, context);
+    const result = statementAllow.find();
+
+    expect(result).toBe(false);
+  });
+
   it("should return false when '=' is not found", () => {
     document.lineAt = jest.fn().mockReturnValue({ text: "effect " });
     const position = new vscode.Position(7, 0);

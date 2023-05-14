@@ -18,7 +18,10 @@ export class StatementAllow implements LexiconLocator {
 
   find(): boolean {
     const lineText = this._document.lineAt(this._position.line).text;
-    if (lineText.substring(0, this._position.character).trim().endsWith("=")) {
+    if (
+      lineText.includes("effect") &&
+      lineText.substring(0, this._position.character).trim().endsWith("=")
+    ) {
       for (let i = this._position.line; i >= 0; i--) {
         const lineText = this._document.lineAt(i).text.trim();
         if (lineText.startsWith("statement {")) {
