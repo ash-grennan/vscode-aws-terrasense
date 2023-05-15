@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { StatementActions } from "./lexiconModules/statementActions";
 import { StatementAllow } from "./lexiconModules/statementAllow";
+import { StatementConditionTest } from "./lexiconModules/statementConditionTest";
 import { LexiconLocator } from "./lexiconModules/types";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -11,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
       position: vscode.Position,
       context: vscode.ExtensionContext
     ) => LexiconLocator
-  > = [StatementActions, StatementAllow];
+  > = [StatementActions, StatementAllow, StatementConditionTest];
 
   let disposable = vscode.languages.registerCompletionItemProvider(
     { pattern: "**/*.tf" },
