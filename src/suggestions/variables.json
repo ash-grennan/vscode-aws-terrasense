@@ -1,0 +1,30 @@
+{
+  "suggestions": [
+    "aws:CurrentTime",
+    "aws:EpochTime",
+    "aws:MultiFactorAuthAge",
+    "aws:MultiFactorAuthPresent",
+    "aws:PrincipalArn",
+    "aws:PrincipalOrgID",
+    "aws:PrincipalTag/${TagKey}",
+    "aws:PrincipalType",
+    "aws:Referer",
+    "aws:RequestTag/${TagKey}",
+    "aws:RequestedRegion",
+    "aws:SecureTransport",
+    "aws:SourceAccount",
+    "aws:SourceArn",
+    "aws:SourceIp",
+    "aws:SourceVpc",
+    "aws:SourceVpce",
+    "aws:TagKeys",
+    "aws:TokenIssueTime",
+    "aws:UserAgent",
+    "aws:ViaAWSService",
+    "aws:userid",
+    "aws:username",
+    "aws:RequestTag/${TagKey}",
+    "aws:ResourceTag/${TagKey}",
+    "aws:TagKeys"
+  ]
+}
