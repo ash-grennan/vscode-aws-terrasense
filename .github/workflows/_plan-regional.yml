@@ -17,6 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        include:
+          NAME: Ash
     steps:
       - name: Test
-        run: echo ${{ inputs.module }}
+        run: echo ${{ inputs.module }} ${{ matrix.NAME }}
