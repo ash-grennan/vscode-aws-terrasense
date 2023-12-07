@@ -1,0 +1,10 @@
+{
+  "include": [
+    { "module": "by-my-order-id" },
+    { "module": "by-order-id" },
+    { "module": "by-order-id-s3" },
+    { "module": "by-customer-id" },
+    { "module": "secrets" },
+    { "module": "search" }
+  ]
+}
