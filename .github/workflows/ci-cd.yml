@@ -18,6 +18,9 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
       - id: set-matrix
         run: |
           JSON=$(jq -c . < ./.github/workflows/module.json)
