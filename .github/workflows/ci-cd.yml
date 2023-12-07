@@ -1,0 +1,36 @@
+﻿name: ci-cd
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "images/**"
+      - ".gitignore"
+
+permissions:
+  id-token: write
+  packages: read
+  contents: write
+  pull-requests: read
+
+jobs:
+  list-modules:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - id: set-matrix
+        run: |
+          echo "matrix={\"\include\": [{\"module\": \"by-my-order-id\"}, {\"module\": \"by-order-id\"}, {\"module\": \"by-order-id-s3\"}, {\"module\": \"by-customer-id\"}, {\"module\": \"secrets\"}, {\"module\": \"search\"}]}" >> "${GITHUB_OUTPUT}"
+
+  plan-regional:
+    needs: [plan-global, get-modules]
+    uses: ./.github/workflows/_plan-regional.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.get-modules.outputs.matrix) }}
+    with:
+      environment: ${{ inputs.environment }}
+      module: ${{ matrix.module }}

@@ -1,0 +1,22 @@
+﻿name: _plan-regional
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        description: The environment to deploy to
+        type: string
+      module:
+        required: true
+        description: The module to deploy
+        type: string
+jobs:
+  plan-regional:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+    steps:
+      - name: Test
+        run: echo ${{ inputs.module }}
