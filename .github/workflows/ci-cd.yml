@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/_plan-regional.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.list-modules.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.list-modules.outputs.matrix) }}
     with:
       environment: ${{ inputs.environment }}
       module: ${{ matrix.module }}
