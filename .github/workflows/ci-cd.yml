@@ -26,11 +26,11 @@ jobs:
           echo "matrix={\"\include\": [{\"module\": \"by-my-order-id\"}, {\"module\": \"by-order-id\"}, {\"module\": \"by-order-id-s3\"}, {\"module\": \"by-customer-id\"}, {\"module\": \"secrets\"}, {\"module\": \"search\"}]}" >> "${GITHUB_OUTPUT}"
 
   plan-regional:
-    needs: [get-modules]
+    needs: [list-modules]
     uses: ./.github/workflows/_plan-regional.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.get-modules.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.list-modules.outputs.matrix) }}
     with:
       environment: ${{ inputs.environment }}
       module: ${{ matrix.module }}
