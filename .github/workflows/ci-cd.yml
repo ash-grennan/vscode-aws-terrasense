@@ -20,7 +20,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          JSON=$(jq -c . < ./.github/workflows/modules.json)
+          JSON=$(jq -c . < ./.github/workflows/module.json)
           echo "Matrix contents: $JSON"
           echo "matrix=$JSON" >> $GITHUB_OUTPUT
   plan-regional:
